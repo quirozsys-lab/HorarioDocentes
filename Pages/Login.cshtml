@@ -1,0 +1,40 @@
+@page
+@model HorarioDocentes.Pages.LoginModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ingresar - Horario de Docentes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body class="login-body">
+    <div class="login-wrap">
+        <div class="login-card">
+            <div class="eyebrow mb-1">Horario de Docentes</div>
+            <h1 class="login-title">Ingresar</h1>
+            <form method="post">
+                <input type="password"
+                       name="Password"
+                       placeholder="Clave de acceso"
+                       class="login-input"
+                       autofocus
+                       autocomplete="current-password" />
+
+                @if (!string.IsNullOrEmpty(Model.Error))
+                {
+                    <p class="login-error">@Model.Error</p>
+                }
+
+                <button type="submit" class="login-button">Entrar</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

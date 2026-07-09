@@ -1,10 +1,29 @@
 using HorarioDocentes.Data;
 using HorarioDocentes.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login";
+        options.AccessDeniedPath = "/Login";
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
+        options.SlidingExpiration = true;
+    });
+builder.Services.AddAuthorization();
+
+builder.Services.AddRazorPages(options =>
+{
+    // Todo el sitio requiere haber iniciado sesión, salvo la página de Login
+    // (y la de Error, para no bloquear el aviso de error si la sesión expiró).
+    options.Conventions.AuthorizeFolder("/");
+    options.Conventions.AllowAnonymousToPage("/Login");
+    options.Conventions.AllowAnonymousToPage("/Error");
+});
 builder.Services.AddServerSideBlazor(options =>
 {
     // TEMPORAL para depurar: muestra el detalle real de la excepción en el navegador.
@@ -31,7 +50,16 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 
-app.MapBlazorHub();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapGet("/logout", async (HttpContext ctx) =>
+{
+    await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.Redirect("/Login");
+});
+
+app.MapBlazorHub().RequireAuthorization();
 app.MapFallbackToPage("/_Host");
 
 // Railway asigna el puerto por variable de entorno PORT; sin esto la app
