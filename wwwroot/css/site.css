@@ -1,3 +1,147 @@
+/* ============================================================
+   Identidad: "pase de aula" — verde pizarra + tiza mostaza
+   sobre papel cálido. Fraunces para títulos, Inter para texto,
+   IBM Plex Mono para horas y códigos de sección.
+   ============================================================ */
+
+:root {
+    --color-bg: #FBF8F2;
+    --color-paper: #FFFFFF;
+    --color-ink: #22301F;
+    --color-ink-soft: #5B6359;
+    --color-primary: #2E4034;
+    --color-primary-dark: #1C2A21;
+    --color-accent: #E3A008;
+    --color-line: #E4DFD0;
+    --color-success: #3F7D58;
+    --color-success-bg: #EAF2EC;
+
+    /* Sobreescribe la paleta de MudBlazor con nuestros tokens */
+    --mud-palette-primary: var(--color-primary);
+    --mud-palette-primary-darken: var(--color-primary-dark);
+    --mud-palette-secondary: var(--color-accent);
+    --mud-palette-background: var(--color-bg);
+    --mud-palette-background-grey: var(--color-bg);
+    --mud-palette-surface: var(--color-paper);
+    --mud-palette-appbar-background: var(--color-primary);
+    --mud-palette-appbar-text: var(--color-bg);
+    --mud-palette-drawer-background: var(--color-paper);
+    --mud-palette-drawer-text: var(--color-ink);
+    --mud-palette-drawer-icon: var(--color-primary);
+    --mud-palette-text-primary: var(--color-ink);
+    --mud-palette-text-secondary: var(--color-ink-soft);
+    --mud-palette-success: var(--color-success);
+    --mud-palette-lines-default: var(--color-line);
+    --mud-palette-divider: var(--color-line);
+    --mud-palette-table-lines: var(--color-line);
+
+    /* Tipografía */
+    --mud-typography-default-family: 'Inter', sans-serif;
+    --mud-typography-body1-family: 'Inter', sans-serif;
+    --mud-typography-body2-family: 'Inter', sans-serif;
+    --mud-typography-button-family: 'Inter', sans-serif;
+    --mud-typography-caption-family: 'IBM Plex Mono', monospace;
+    --mud-typography-h1-family: 'Fraunces', serif;
+    --mud-typography-h2-family: 'Fraunces', serif;
+    --mud-typography-h3-family: 'Fraunces', serif;
+    --mud-typography-h4-family: 'Fraunces', serif;
+    --mud-typography-h5-family: 'Fraunces', serif;
+    --mud-typography-h6-family: 'Fraunces', serif;
+}
+
 html, body {
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.mud-typography-h1, .mud-typography-h2, .mud-typography-h3,
+.mud-typography-h4, .mud-typography-h5, .mud-typography-h6 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Marca en la barra superior, con un pequeño subrayado de tiza */
+.brand-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+.brand-underline {
+    display: inline-block;
+    border-bottom: 3px solid var(--color-accent);
+    padding-bottom: 2px;
+}
+
+/* Etiqueta tipo "parte de asistencia" para textos cortos en mayúsculas */
+.eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    opacity: 0.85;
+}
+
+/* Enlace activo del menú lateral: barra de tiza a la izquierda */
+.mud-nav-link.active {
+    background-color: var(--color-success-bg) !important;
+    border-left: 3px solid var(--color-accent);
+}
+
+/* Tarjetas de contenido: borde superior fino como una hoja de parte */
+.mud-paper {
+    border-top: 3px solid var(--color-line);
+}
+
+/* ============================================================
+   Elemento propio: el "pase de aula" — la tarjeta de resultado
+   con forma de boleto perforado, como un pase físico de salón.
+   ============================================================ */
+.pase-aula {
+    position: relative;
+    background: var(--color-paper);
+    border: 1.5px dashed var(--color-line) !important;
+    border-radius: 6px;
+    padding: 32px 36px;
+    margin-top: 24px;
+}
+.pase-aula::before,
+.pase-aula::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    background: var(--color-bg);
+    border-radius: 50%;
+    border: 1.5px dashed var(--color-line);
+}
+.pase-aula::before { left: -14px; }
+.pase-aula::after { right: -14px; }
+
+.pase-aula .pase-nombre {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--color-success);
+    line-height: 1.15;
+    margin-bottom: 4px;
+}
+.pase-aula .pase-dato {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+}
+.pase-aula .pase-dato b {
+    color: var(--color-primary);
+}
+
+/* Vacío / sin clase registrada: mantenemos el tono de aviso, sin ticket */
+.pase-vacio {
+    border-left: 3px solid var(--color-accent) !important;
 }

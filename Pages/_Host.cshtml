@@ -11,8 +11,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Horario de Docentes</title>
     <base href="~/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+    <style>
+        #components-reconnect-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+        #components-reconnect-modal .reconnect-box {
+            background: #1e1e1e;
+            padding: 24px 32px;
+            border-radius: 8px;
+        }
+        .components-reconnect-show,
+        .components-reconnect-failed,
+        .components-reconnect-rejected {
+            display: flex !important;
+        }
+        .components-reconnect-failed .reconnect-msg::after,
+        .components-reconnect-rejected .reconnect-msg::after {
+            content: " No se pudo reconectar. Toca 'Reintentar' o recarga la página.";
+        }
+        .components-reconnect-show .reconnect-msg::after {
+            content: " Conexión perdida, reconectando...";
+        }
+    </style>
 </head>
 <body>
     <component type="typeof(HorarioDocentes.App)" render-mode="Server" />
@@ -21,6 +55,17 @@
         Ocurrió un error inesperado.
         <a href="" class="reload" style="margin-left:8px;">Recargar</a>
         <a class="dismiss" style="margin-left:8px; cursor:pointer;">🗙</a>
+    </div>
+
+    <div id="components-reconnect-modal">
+        <div class="reconnect-box">
+            <div class="reconnect-msg"></div>
+            <div style="margin-top:12px;">
+                <button onclick="window.location.reload()" style="padding:8px 16px; cursor:pointer;">
+                    Recargar página
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="_framework/blazor.server.js"></script>

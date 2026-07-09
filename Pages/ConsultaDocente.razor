@@ -56,23 +56,22 @@ else
 
     @if (_resultado != null)
     {
-        <MudPaper Class="pa-4 pa-sm-6 mt-4" Elevation="2">
-            @if (_resultado.Encontrado)
-            {
-                <MudText Typo="Typo.h5" Color="Color.Success" Class="mb-2">
-                    Aula (sección): @_resultado.Seccion
-                </MudText>
-                <MudText Typo="Typo.h6">Área: <b>@_resultado.Area</b></MudText>
-                <MudText>Horario del bloque: @_resultado.HoraInicio - @_resultado.HoraFin</MudText>
-            }
-            else
-            {
-                <MudAlert Severity="Severity.Info">
-                    Este docente no tiene clase registrada el día @_diaSeleccionado a esa hora
-                    (puede ser un recreo, hora libre, o no dicta en ese turno).
-                </MudAlert>
-            }
-        </MudPaper>
+        @if (_resultado.Encontrado)
+        {
+            <div class="pase-aula">
+                <div class="eyebrow mb-1">En este momento &middot; @_diaSeleccionado</div>
+                <div class="pase-nombre">Aula: @_resultado.Seccion</div>
+                <div class="pase-dato">Área: <b>@_resultado.Area</b></div>
+                <div class="pase-dato">Bloque: @_resultado.HoraInicio – @_resultado.HoraFin</div>
+            </div>
+        }
+        else
+        {
+            <MudAlert Severity="Severity.Info" Class="mt-4 pase-vacio">
+                Este docente no tiene clase registrada el día @_diaSeleccionado a esa hora
+                (puede ser un recreo, hora libre, o no dicta en ese turno).
+            </MudAlert>
+        }
     }
 }
 
