@@ -1,0 +1,125 @@
+@page "/consulta-seccion"
+@inject HorarioService HorarioService
+
+<PageTitle>Consultar por Sección</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">¿Con qué profesor y qué área tiene clase una sección?</MudText>
+
+@if (_secciones == null)
+{
+    <MudProgressLinear Indeterminate="true" />
+}
+else if (_secciones.Count == 0)
+{
+    <MudAlert Severity="Severity.Warning">
+        Aún no hay ningún horario cargado. Ve a "Cargar Excel" primero.
+    </MudAlert>
+}
+else
+{
+    <MudPaper Class="pa-6" Elevation="2">
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <MudSelect T="string" Label="Sección" @bind-Value="_seccionSeleccionada" Variant="Variant.Outlined">
+                    @foreach (var s in _secciones)
+                    {
+                        <MudSelectItem Value="@s">@s</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudSelect T="string" Label="Día" @bind-Value="_diaSeleccionado" Variant="Variant.Outlined">
+                    @foreach (var d in _dias)
+                    {
+                        <MudSelectItem Value="@d">@d</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="4">
+                <MudTimePicker Label="Hora" @bind-Time="_horaSeleccionada" Variant="Variant.Outlined" AmPm="false" />
+            </MudItem>
+        </MudGrid>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="mt-4"
+                   StartIcon="@Icons.Material.Filled.Search"
+                   Disabled="@(_seccionSeleccionada == null || _diaSeleccionado == null || _horaSeleccionada == null)"
+                   OnClick="Consultar">
+            Consultar
+        </MudButton>
+
+        <MudButton Variant="Variant.Text"
+                   Class="mt-4 ml-2"
+                   StartIcon="@Icons.Material.Filled.AccessTime"
+                   OnClick="UsarAhora">
+            Usar día y hora actual
+        </MudButton>
+    </MudPaper>
+
+    @if (_resultado != null)
+    {
+        <MudPaper Class="pa-6 mt-4" Elevation="2">
+            @if (_resultado.Encontrado)
+            {
+                <MudText Typo="Typo.h6" Color="Color.Success">
+                    @_resultado.Docente
+                </MudText>
+                <MudText>Área: <b>@_resultado.Area</b></MudText>
+                <MudText>Turno: @_resultado.Turno</MudText>
+                <MudText>Horario del bloque: @_resultado.HoraInicio - @_resultado.HoraFin</MudText>
+            }
+            else
+            {
+                <MudAlert Severity="Severity.Info">
+                    No hay clase registrada para "@_seccionSeleccionada" el día @_diaSeleccionado a esa hora
+                    (puede ser un recreo o un espacio libre).
+                </MudAlert>
+            }
+        </MudPaper>
+    }
+}
+
+@code {
+    private static readonly string[] _dias = { "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO", "DOMINGO" };
+
+    private List<string>? _secciones;
+    private string? _seccionSeleccionada;
+    private string? _diaSeleccionado;
+    private TimeSpan? _horaSeleccionada;
+    private ResultadoConsulta? _resultado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _secciones = await HorarioService.ObtenerSeccionesAsync();
+        UsarAhora();
+    }
+
+    private void UsarAhora()
+    {
+        var ahora = DateTime.Now;
+        _diaSeleccionado = DiaEnEspanol(ahora.DayOfWeek);
+        _horaSeleccionada = ahora.TimeOfDay;
+        _resultado = null;
+    }
+
+    private static string DiaEnEspanol(DayOfWeek dia) => dia switch
+    {
+        DayOfWeek.Monday => "LUNES",
+        DayOfWeek.Tuesday => "MARTES",
+        DayOfWeek.Wednesday => "MIERCOLES",
+        DayOfWeek.Thursday => "JUEVES",
+        DayOfWeek.Friday => "VIERNES",
+        DayOfWeek.Saturday => "SABADO",
+        DayOfWeek.Sunday => "DOMINGO",
+        _ => "LUNES"
+    };
+
+    private async Task Consultar()
+    {
+        if (_seccionSeleccionada == null || _diaSeleccionado == null || _horaSeleccionada == null) return;
+
+        _resultado = await HorarioService.ConsultarPorSeccionAsync(
+            _seccionSeleccionada, _diaSeleccionado, _horaSeleccionada.Value);
+    }
+}

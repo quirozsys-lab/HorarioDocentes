@@ -1,0 +1,122 @@
+@page "/"
+@inject ExcelParserService ParserService
+@inject HorarioService HorarioService
+@inject ISnackbar Snackbar
+
+<PageTitle>Cargar Excel</PageTitle>
+
+<MudText Typo="Typo.h4" Class="mb-4">Cargar horario de docentes</MudText>
+
+<MudText Class="mb-4">
+    Sube el archivo Excel con los horarios (formato "Horario x docente"). Al subir un nuevo archivo,
+    <b>se reemplaza por completo</b> el horario cargado anteriormente.
+</MudText>
+
+<MudPaper Class="pa-6" Elevation="2">
+    <InputFile OnChange="OnFileSelected" accept=".xlsx" id="fileInput" style="display:none" />
+    <MudButton HtmlTag="label"
+               for="fileInput"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.UploadFile"
+               Disabled="@_procesando">
+        Seleccionar archivo .xlsx
+    </MudButton>
+
+    @if (_nombreArchivo != null)
+    {
+        <MudText Class="mt-3">Archivo seleccionado: <b>@_nombreArchivo</b></MudText>
+    }
+
+    @if (_procesando)
+    {
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-4" />
+        <MudText Class="mt-2">Procesando archivo...</MudText>
+    }
+</MudPaper>
+
+@if (_advertencias.Count > 0)
+{
+    <MudAlert Severity="Severity.Warning" Class="mt-4">
+        <MudText><b>@_advertencias.Count advertencia(s) durante el procesamiento:</b></MudText>
+        <ul>
+            @foreach (var a in _advertencias.Take(20))
+            {
+                <li>@a</li>
+            }
+        </ul>
+        @if (_advertencias.Count > 20)
+        {
+            <MudText>... y @(_advertencias.Count - 20) más.</MudText>
+        }
+    </MudAlert>
+}
+
+@if (_resultadoOk != null)
+{
+    <MudAlert Severity="Severity.Success" Class="mt-4">
+        Carga completada: <b>@_resultadoOk.Value.docentes</b> docentes y
+        <b>@_resultadoOk.Value.clases</b> bloques de clase registrados.
+    </MudAlert>
+}
+
+@if (_hayDatosPrevios && _resultadoOk == null && !_procesando)
+{
+    <MudAlert Severity="Severity.Info" Class="mt-4">
+        Ya hay un horario cargado en el sistema. Puedes ir directo a las consultas desde el menú.
+    </MudAlert>
+}
+
+@code {
+    private bool _procesando = false;
+    private string? _nombreArchivo;
+    private List<string> _advertencias = new();
+    private (int docentes, int clases)? _resultadoOk;
+    private bool _hayDatosPrevios;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hayDatosPrevios = await HorarioService.HayDatosCargadosAsync();
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        _procesando = true;
+        _resultadoOk = null;
+        _advertencias.Clear();
+        _nombreArchivo = e.File.Name;
+        StateHasChanged();
+
+        try
+        {
+            const long maxSize = 10 * 1024 * 1024; // 10 MB
+            await using var stream = e.File.OpenReadStream(maxSize);
+            await using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+
+            var parseResult = ParserService.Parsear(memoryStream);
+            _advertencias = parseResult.Advertencias;
+
+            if (parseResult.Docentes.Count == 0)
+            {
+                Snackbar.Add("No se encontró ningún docente en el archivo. Revisa el formato.", Severity.Error);
+            }
+            else
+            {
+                var (docentes, clases) = await HorarioService.GuardarCargaAsync(parseResult, _nombreArchivo);
+                _resultadoOk = (docentes, clases);
+                _hayDatosPrevios = true;
+                Snackbar.Add("Horario cargado correctamente.", Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error al procesar el archivo: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _procesando = false;
+        }
+    }
+}

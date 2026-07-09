@@ -1,0 +1,29 @@
+@page "/"
+@namespace HorarioDocentes.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horario de Docentes</title>
+    <base href="~/" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="css/site.css" rel="stylesheet" />
+</head>
+<body>
+    <component type="typeof(HorarioDocentes.App)" render-mode="Server" />
+
+    <div id="blazor-error-ui" style="display:none; position:fixed; bottom:0; width:100%; background:#ffcccc; padding:12px; z-index:9999;">
+        Ocurrió un error inesperado.
+        <a href="" class="reload" style="margin-left:8px;">Recargar</a>
+        <a class="dismiss" style="margin-left:8px; cursor:pointer;">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+</body>
+</html>
