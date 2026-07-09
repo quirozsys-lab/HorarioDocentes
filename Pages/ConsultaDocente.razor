@@ -96,7 +96,7 @@ else
 
     private void UsarAhora()
     {
-        var ahora = DateTime.Now;
+        var ahora = PeruTime.Ahora();
         _diaSeleccionado = DiaEnEspanol(ahora.DayOfWeek);
         _horaSeleccionada = ahora.TimeOfDay;
         _resultado = null;
